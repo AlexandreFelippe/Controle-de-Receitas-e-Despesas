@@ -102,9 +102,9 @@ def insert_revenue():
     # attualizando dados
     table()
     resumo()
-    grafico_pie()
-    percentual_gastos()
-    grafico()
+    pie_graph()
+    expenses_percentage()
+    grafico_barra()
 
 
 def insert_expense():
@@ -126,9 +126,9 @@ def insert_expense():
     # atualizando dados
     table()
     resumo()
-    grafico_pie()
-    percentual_gastos()
-    grafico()
+    pie_graph()
+    expenses_percentage()
+    grafico_barra()
 
 
 def delete():
@@ -156,18 +156,18 @@ def delete():
         # Atualizando dados
         table()
         resumo()
-        grafico_pie()
-        percentual_gastos()
-        grafico()
+        pie_graph()
+        expenses_percentage()
+        grafico_barra()
     except Exception as e:
         messagebox.showerror("Erro", f"Erro ao excluir dado: {str(e)}")
 
 
 # frame2
-def percentual_gastos():
+def expenses_percentage():
     label_porcentagem = Label(
         frame2,
-        text="Percentual da Receita Gasta",
+        text="Percentual Receita Restante",
         font=("Arial", 12),
         height=1,
         anchor=NW,
@@ -185,9 +185,9 @@ def percentual_gastos():
         frame2, length=180, style="black.Horizontal.TProgressbar"
     )
     label_progressbar.place(x=10, y=35)
-    label_progressbar["value"] = 50
+    label_progressbar["value"] = view.line_chart()
 
-    percentual = 50
+    percentual = view.line_chart()
 
     label_porcentagem_text = Label(
         frame2,
@@ -200,9 +200,9 @@ def percentual_gastos():
     label_porcentagem_text.place(x=200, y=35)
 
 
-def grafico():
+def grafico_barra():
     lista_categorias = ["Renda", "Despesas", "Saldo"]
-    lista_valores = [1000, 600, 400]
+    lista_valores = view.bar_graph()
 
     fig = plt.figure(figsize=(4, 3.45), dpi=60)
     ax = fig.add_subplot(111)
@@ -244,8 +244,8 @@ def grafico():
     canva.get_tk_widget().place(x=10, y=70)
 
 
-percentual_gastos()
-grafico()
+expenses_percentage()
+grafico_barra()
 
 frame_renda = Frame(frame3, width=300, height=280, bg=branca)
 frame_renda.grid(row=0, column=0)
@@ -271,7 +271,7 @@ img_tabela.place(x=5, y=309)
 
 
 def resumo():
-    valor = [345, 225, 534]
+    valor = view.bar_graph()
     label_linha = Label(
         frame2,
         text="",
@@ -369,12 +369,12 @@ def resumo():
 resumo()
 
 
-def grafico_pie():
+def pie_graph():
     # faça figura e atribua objetos de eixo
     figura = plt.Figure(figsize=(5, 3), dpi=90)
     ax = figura.add_subplot(111)
-    lista_valores = [345, 225, 534]
-    lista_categorias = ["Alimentação", "Aluguel", "Vestuário"]
+    lista_valores = view.pie_chart()[1]
+    lista_categorias = view.pie_chart()[0]
 
     # only "explode" the 2nd slice (i.e. 'Hogs')
     explode = []
@@ -396,7 +396,7 @@ def grafico_pie():
     canva_categoria.get_tk_widget().grid(row=0, column=0)
 
 
-grafico_pie()
+pie_graph()
 
 
 def table():
