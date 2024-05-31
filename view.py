@@ -28,7 +28,7 @@ def inserir_receita(i):
 def excluir_receita(i):
     with con:
         cur = con.cursor()
-        query = "DELETE FROM Receitas WHERE categoria = ?"
+        query = "DELETE FROM Receitas WHERE id = ?"
         cur.execute(query, i)
 
 
@@ -42,7 +42,7 @@ def inserir_despesa(i):
 def excluir_despesa(i):
     with con:
         cur = con.cursor()
-        query = "DELETE FROM Despesas WHERE categoria = ?"
+        query = "DELETE FROM Despesas WHERE id = ?"
         cur.execute(query, i)
 
 
@@ -53,8 +53,8 @@ def listar_categorias():
         cur.execute("SELECT * FROM Categoria")
         rows = cur.fetchall()
         for row in rows:
-            lista_categorias.append(row[1])
-        return lista_categorias()
+            lista_categorias.append(row)
+        return lista_categorias
 
 
 def listar_receitas():

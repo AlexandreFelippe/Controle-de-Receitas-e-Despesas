@@ -4,11 +4,9 @@ from PIL import Image, ImageTk
 from tkinter.ttk import Progressbar
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
-# from matplotlib.figure import Figure
 from tkcalendar import DateEntry
-# from datetime import date
-from tkinter import Entry, Button, RIDGE
-
+from tkinter import Entry, Button, RIDGE, messagebox
+import view
 
 preto = "#000000"
 branca = "#FFFFFF"
@@ -22,7 +20,6 @@ verde2 = "#e9edf5"
 
 colors = ["#5588bb", "#66bbbb", "#99bb55", "#ee9944", "#444466", "#bb5555"]
 
-
 janela = Tk()
 janela.title("Controle Financeiro")
 janela.geometry("1050x670")
@@ -30,6 +27,7 @@ janela.configure(bg=verde2)
 
 style = ttk.Style(janela)
 style.theme_use("clam")
+
 # criando frames
 frame1 = Frame(janela, width=1043, height=50, bg=branca, relief="flat")
 frame1.grid(row=0, column=0)
@@ -59,6 +57,110 @@ img_logo = Label(
     bg=branca,
 )
 img_logo.place(x=0, y=0)
+
+global tree
+
+
+def insert_category():
+    name = entry_category.get()
+
+    list_insert = [name]
+
+    for i in list_insert:
+        if i == "":
+            messagebox.showerror("Erro", "Preencha todos os campos")
+            return
+    view.inserir_categoria(list_insert)
+    messagebox.showinfo("Sucesso", "Categoria inserida com sucesso")
+    entry_category.delete(0, "end")
+
+    function_category = view.listar_categorias()
+    category = []
+
+    for i in function_category:
+        category.append(i[1])
+
+    combo_categoria_despesas["values"] = category
+
+
+def insert_revenue():
+    name = "Revenue"
+    date = cal_receitas.get()
+    value = cal_receitas.get()
+
+    list_insert = [name, date, value]
+
+    for i in list_insert:
+        if i == "":
+            messagebox.showerror("Erro", "Preencha todos os campos")
+            return
+    view.inserir_receita(list_insert)
+    messagebox.showinfo("Sucesso", "Receita inserida com sucesso")
+    cal_receitas.delete(0, "end")
+    cal_receitas.delete(0, "end")
+
+    # attualizando dados
+    table()
+    resumo()
+    grafico_pie()
+    percentual_gastos()
+    grafico()
+
+
+def insert_expense():
+    name = combo_categoria_despesas.get()
+    date = cal_despesas.get()
+    value = valor_despesas.get()
+
+    list_insert = [name, date, value]
+
+    for i in list_insert:
+        if i == "":
+            messagebox.showerror("Erro", "Preencha todos os campos")
+            return
+    view.inserir_despesa(list_insert)
+    messagebox.showinfo("Sucesso", "Despesa inserida com sucesso")
+    cal_despesas.delete(0, "end")
+    valor_despesas.delete(0, "end")
+
+    # atualizando dados
+    table()
+    resumo()
+    grafico_pie()
+    percentual_gastos()
+    grafico()
+
+
+def delete():
+    try:
+        treev_data = tree.focus()
+        treev_dict = tree.item(treev_data)
+        treev_values = treev_dict["values"]
+        if not treev_values:
+            messagebox.showerror("Erro", "Nenhum item selecionado")
+            return
+        item_id = treev_values[0]
+
+        # Verifica se o item é uma despesa ou receita
+        item_categoria = treev_values[1]
+
+        if item_categoria in (
+            [categoria[1] for categoria in view.listar_categorias()]
+        ):
+            view.excluir_despesa([item_id])
+            messagebox.showinfo("Sucesso", "Despesa excluída com sucesso")
+        else:
+            view.excluir_receita([item_id])
+            messagebox.showinfo("Sucesso", "Receita excluída com sucesso")
+
+        # Atualizando dados
+        table()
+        resumo()
+        grafico_pie()
+        percentual_gastos()
+        grafico()
+    except Exception as e:
+        messagebox.showerror("Erro", f"Erro ao excluir dado: {str(e)}")
 
 
 # frame2
@@ -145,18 +247,17 @@ def grafico():
 percentual_gastos()
 grafico()
 
-frame_renda = Frame(frame3, width=300, height=250, bg=branca)
+frame_renda = Frame(frame3, width=300, height=280, bg=branca)
 frame_renda.grid(row=0, column=0)
 
-frame_operacoes = Frame(frame3, width=220, height=250, bg=branca)
+frame_operacoes = Frame(frame3, width=220, height=280, bg=branca)
 frame_operacoes.grid(row=0, column=1, padx=5)
 
-frame_configuracao = Frame(frame3, width=220, height=250, bg=branca)
+frame_configuracao = Frame(frame3, width=250, height=280, bg=branca)
 frame_configuracao.grid(row=0, column=2, padx=5)
 
 frame_gra_2 = Frame(frame2, width=300, height=250, bg=branca)
-frame_gra_2.place(x=415, y=5)
-
+frame_gra_2.place(x=500, y=5)
 
 img_tabela = Label(
     frame2,
@@ -273,7 +374,7 @@ def grafico_pie():
     figura = plt.Figure(figsize=(5, 3), dpi=90)
     ax = figura.add_subplot(111)
     lista_valores = [345, 225, 534]
-    lista_categorias = ['Alimentação', 'Aluguel', 'Vestuário']
+    lista_categorias = ["Alimentação", "Aluguel", "Vestuário"]
 
     # only "explode" the 2nd slice (i.e. 'Hogs')
     explode = []
@@ -283,10 +384,11 @@ def grafico_pie():
         lista_valores,
         explode=explode,
         wedgeprops=dict(width=0.2),
-        autopct='%1.1f%%',
+        autopct="%1.1f%%",
         colors=colors,
         shadow=True,
-        startangle=90)
+        startangle=90,
+    )
     ax.legend(
         lista_categorias, loc="center right", bbox_to_anchor=(1.55, 0.50))
 
@@ -297,10 +399,14 @@ def grafico_pie():
 grafico_pie()
 
 
-def mostrar_renda():
-    tabela_head = ["id", "Categoria", "Data", "Valor"]
+def table():
+    tabela_head = ["ID", "Categoria", "Data", "Valor"]
 
-    lista_itens = [[0, 2, 3, 4], [1, 2, 3, 4], [2, 2, 3, 4], [3, 2, 3, 4]]
+    despesas = view.listar_despesas()
+    receitas = view.listar_receitas()
+
+    # Concatenar as listas de despesas e receitas
+    lista_itens = despesas + receitas
 
     global tree
 
@@ -312,7 +418,6 @@ def mostrar_renda():
     )
 
     vsb = ttk.Scrollbar(frame_renda, orient="vertical", command=tree.yview)
-
     hsb = ttk.Scrollbar(frame_renda, orient="horizontal", command=tree.xview)
 
     tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
@@ -325,14 +430,13 @@ def mostrar_renda():
     h = [30, 100, 100, 100]
     n = 0
 
-    for i in tabela_head:
-        tree.heading(i, text=i.title(), anchor="center")
-        tree.column(i, width=h[n], anchor=hd[n])
-
+    for col in tabela_head:
+        tree.heading(col, text=col.title(), anchor="center")
+        tree.column(col, width=h[n], anchor=hd[n])
         n += 1
 
-    for i in lista_itens:
-        tree.insert("", "end", values=i)
+    for item in lista_itens:
+        tree.insert("", "end", values=item)
 
 
 label_titulo = Label(
@@ -358,7 +462,7 @@ label_categoria = Label(
 
 label_categoria.place(x=10, y=40)
 
-categoria_box = ["Viagem", "Comida"]
+categoria_box = view.listar_categorias()
 categoria = []
 
 for i in categoria_box:
@@ -414,6 +518,7 @@ img_add_despesa = ImageTk.PhotoImage(img_add_despesa)
 add_button = Button(
     frame_operacoes,
     image=img_add_despesa,
+    command=insert_expense,
     text="Adicionar",
     font=("Ivy 7 bold"),
     overrelief=RIDGE,
@@ -425,13 +530,13 @@ add_button = Button(
 )
 add_button.place(x=110, y=131)
 
-
 img_delete_despesa = Image.open("remove.png")
 img_delete_despesa = img_delete_despesa.resize((17, 17))
 img_delete_despesa = ImageTk.PhotoImage(img_delete_despesa)
 
 delete_button = Button(
     frame_operacoes,
+    command=delete,
     image=img_delete_despesa,
     text="Excluir",
     font=("Ivy 7 bold"),
@@ -444,7 +549,6 @@ delete_button = Button(
 )
 delete_button.place(x=110, y=171)
 
-
 label_receitas = Label(
     frame_configuracao,
     text="Insira novas receitas",
@@ -454,7 +558,7 @@ label_receitas = Label(
     bg=branca,
     fg=valor,
 )
-label_receitas.place(x=10, y=10)
+label_receitas.place(x=30, y=10)
 
 label_categoria_receitas = Label(
     frame_configuracao,
@@ -465,7 +569,7 @@ label_categoria_receitas = Label(
     bg=branca,
     fg=valor,
 )
-label_categoria_receitas.place(x=10, y=40)
+label_categoria_receitas.place(x=30, y=40)
 entrada_categoria_receitas = DateEntry(
     frame_configuracao,
     width=12,
@@ -474,9 +578,9 @@ entrada_categoria_receitas = DateEntry(
     borderwidth=2,
     year=2023,
     justify="left",
-    relief="solid"
-    )
-entrada_categoria_receitas.place(x=110, y=41)
+    relief="solid",
+)
+entrada_categoria_receitas.place(x=130, y=41)
 
 label_cal_receitas = Label(
     frame_configuracao,
@@ -487,11 +591,11 @@ label_cal_receitas = Label(
     bg=branca,
     fg=valor,
 )
-label_cal_receitas.place(x=10, y=71)
+label_cal_receitas.place(x=30, y=71)
 
 cal_receitas = Entry(
     frame_configuracao, width=12, justify="left", relief="solid")
-cal_receitas.place(x=110, y=71)
+cal_receitas.place(x=130, y=71)
 
 img_add_receitas = Image.open("add.png")
 img_add_receitas = img_add_receitas.resize((17, 17))
@@ -500,6 +604,7 @@ img_add_receitas = ImageTk.PhotoImage(img_add_receitas)
 add_button = Button(
     frame_configuracao,
     image=img_add_receitas,
+    command=insert_revenue,
     text="Adicionar",
     font=("Ivy 7 bold"),
     overrelief=RIDGE,
@@ -509,7 +614,7 @@ add_button = Button(
     bg=branca,
     fg=preto,
 )
-add_button.place(x=110, y=105)
+add_button.place(x=130, y=105)
 
 label_insert_category = Label(
     frame_configuracao,
@@ -520,11 +625,11 @@ label_insert_category = Label(
     bg=branca,
     fg=valor,
 )
-label_insert_category.place(x=10, y=140)
+label_insert_category.place(x=30, y=140)
 
 entry_category = Entry(
     frame_configuracao, width=12, justify="left", relief="solid")
-entry_category.place(x=110, y=160)
+entry_category.place(x=130, y=140)
 
 img_add_category = Image.open("add.png")
 img_add_category = img_add_category.resize((17, 17))
@@ -532,8 +637,9 @@ img_add_category = ImageTk.PhotoImage(img_add_category)
 
 add_button = Button(
     frame_configuracao,
+    command=insert_category,
     image=img_add_category,
-    text="Adicionar Categoria",
+    text="Adicionar",
     font=("Ivy 7 bold"),
     overrelief=RIDGE,
     width=80,
@@ -542,7 +648,7 @@ add_button = Button(
     bg=branca,
     fg=preto,
 )
-add_button.place(x=110, y=190)
+add_button.place(x=130, y=170)
 
-mostrar_renda()
+table()
 janela.mainloop()
