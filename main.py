@@ -58,6 +58,20 @@ img_logo = Label(
 )
 img_logo.place(x=0, y=0)
 
+
+# button_details_page = Button(
+#     frame2,
+#     text="Detalhes",
+#     command=view.show_new_window,
+#     font=("Ivy 7 bold"),
+#     overrelief=RIDGE,
+#     width=10,
+#     anchor=NW,
+#     bg=verde1,
+#     fg=branca,
+# )
+# button_details_page.place(x=1000, y=10)
+
 global tree
 
 
@@ -94,7 +108,7 @@ def insert_description():
             return
     view.inserir_descricao(list_insert)
     messagebox.showinfo("Sucesso", "Descrição inserida com sucesso")
-    combo_descrição_despesas.set(0, "end")
+    combo_descrição_despesas.set("end")
 
     function_description = view.listar_descrição()
     description = []
@@ -164,11 +178,9 @@ def delete():
             messagebox.showerror("Erro", "Nenhum item selecionado")
             return
         item_id = treev_values[0]
-        print(item_id)
 
         # Verifica se o item é uma despesa ou receita
         item_categoria = treev_values[1]
-        print(item_categoria)
 
         if item_categoria in (
             [categoria[1] for categoria in view.listar_categorias()]

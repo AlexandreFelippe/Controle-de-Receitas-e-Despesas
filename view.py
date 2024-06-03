@@ -159,3 +159,21 @@ def line_chart():
         percentage = ((total_revenue - total_expense) / total_revenue) * 100
 
     return percentage
+
+
+def date_filter(start_date, end_date):
+    receitas = listar_receitas()
+    despesas = listar_despesas()
+
+    revenue_table = []
+    expense_table = []
+
+    for i in receitas:
+        if start_date <= i[3] <= end_date:
+            revenue_table.append(i)
+
+    for i in despesas:
+        if start_date <= i[3] <= end_date:
+            expense_table.append(i)
+
+    return [revenue_table, expense_table]
