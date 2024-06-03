@@ -8,10 +8,12 @@ with con:
     cur.execute("DROP TABLE IF EXISTS Categoria")
     cur.execute("DROP TABLE IF EXISTS Receitas")
     cur.execute("DROP TABLE IF EXISTS Despesas")
+    cur.execute("DROP TABLE IF EXISTS Descricoes")
     cur.execute("CREATE TABLE Categoria(id INTEGER PRIMARY KEY, nome TEXT)")
     cur.execute(
-        "CREATE TABLE Receitas(id INTEGER PRIMARY KEY, categoria TEXT, adicionado_em DATE, valor REAL)" # noqa
+        "CREATE TABLE Receitas(id INTEGER PRIMARY KEY, categoria TEXT, descricao, adicionado_em DATE, valor REAL)" # noqa
     )
     cur.execute(
-        "CREATE TABLE Despesas(id INTEGER PRIMARY KEY, categoria TEXT, adicionado_em DATE, valor REAL)" # noqa
+        "CREATE TABLE Despesas(id INTEGER PRIMARY KEY, categoria TEXT, descricao TEXT, adicionado_em DATE, valor REAL)" # noqa
     )
+    cur.execute("CREATE TABLE Descricoes(id INTEGER PRIMARY KEY, descricao TEXT)") # noqa
