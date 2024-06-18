@@ -3,10 +3,12 @@ import pandas as pd
 from tkinter import messagebox
 
 
-class ControleFinanceiroModel:
-    def __init__(self):
+class ControleFinanceiroModel():
+    def __init__(self, frame2_view=None, frame3_view=None):
         self.conn = lite.connect("tabela.db")
         self.cur = self.conn.cursor()
+        self.frame2_view = frame2_view
+        self.frame3_view = frame3_view
 
     def inserir_categoria(self, categoria):
         if categoria:
@@ -16,6 +18,9 @@ class ControleFinanceiroModel:
                     self.cur.execute(query, (categoria,))
                     self.conn.commit()
                     messagebox.showinfo(f"Categoria inserida: {categoria}")
+                    if self.frame3_view:
+                        self.frame3_view.update_comboboxes()
+                        self.frame3_view.update_treeview()
             except Exception as e:
                 messagebox.showerror("Erro ao inserir categoria", str(e))
         else:
@@ -29,6 +34,9 @@ class ControleFinanceiroModel:
                     self.cur.execute(query, (descricao,))
                     self.conn.commit()
                     messagebox.showinfo(f"Descrição inserida: {descricao}")
+                    if self.frame3_view:
+                        self.frame3_view.update_comboboxes()
+                        self.frame3_view.update_treeview()
             except Exception as e:
                 messagebox.showerror("Erro ao inserir descrição", str(e))
         else:
@@ -43,6 +51,11 @@ class ControleFinanceiroModel:
                 self.cur.execute(query, receita)
                 self.conn.commit()
                 messagebox.showinfo(f"Receita inserida: {receita}")
+                if self.frame3_view:
+                    self.frame3_view.update_comboboxes()
+                    self.frame3_view.update_treeview()
+                if self.frame2_view:
+                    self.frame2_view.atualizar_frame()
         except Exception as e:
             messagebox.showerror("Erro ao inserir receita", str(e))
 
@@ -55,11 +68,13 @@ class ControleFinanceiroModel:
                 self.cur.execute(query, despesa)
                 self.conn.commit()
                 messagebox.showinfo(f"Despesa inserida: {despesa}")
+                if self.frame3_view:
+                    self.frame3_view.update_comboboxes()
+                    self.frame3_view.update_treeview()
+                if self.frame2_view:
+                    self.frame2_view.atualizar_frame()
         except Exception as e:
             messagebox.showerror("Erro ao inserir despesa", str(e))
-            self.frame2_view.pie_chart()
-            self.frame2_view.bar_graph()
-            self.frame2_view.line_chart()
 
     def delete_item(self, table, item_id):
         try:
@@ -68,11 +83,13 @@ class ControleFinanceiroModel:
                 self.cur.execute(query, (item_id,))
                 self.conn.commit()
                 messagebox.showinfo(f"Item deletado: {item_id}")
+                if self.frame3_view:
+                    self.frame3_view.update_comboboxes()
+                    self.frame3_view.update_treeview()
+                if self.frame2_view:
+                    self.frame2_view.atualizar_frame()
         except Exception as e:
             messagebox.showerror("Erro ao deletar item", str(e))
-        self.pie_chart()
-        self.bar_graph()
-        self.line_chart()
 
     def listar_itens(self, table):
         try:

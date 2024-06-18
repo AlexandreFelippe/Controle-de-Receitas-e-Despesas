@@ -17,9 +17,10 @@ colors = ["#5588bb", "#66bbbb", "#99bb55", "#ee9944", "#444466", "#bb5555"]
 class ControleFinanceiroView:
     def __init__(self, master):
         self.root = master
+        self.model = ControleFinanceiroModel()
         self.criar_tela()
         self.criar_frames()
-        self.model = ControleFinanceiroModel()
+        self.associar_modelo_com_frames()
 
     def criar_tela(self):
         self.root.title("Controle Financeiro")
@@ -33,6 +34,10 @@ class ControleFinanceiroView:
         self.frame1 = Frame1(self)
         self.frame2 = Frame2(self)
         self.frame3 = Frame3(self)
+
+    def associar_modelo_com_frames(self):
+        self.model.frame2_view = self.frame2
+        self.model.frame3_view = self.frame3
 
 
 class Frame1:
@@ -60,12 +65,13 @@ class Frame1:
 
 
 class Frame2(Frame):
-    def __init__(self, controle_financeiro_view, width=1350,
-                 height=370, bg=frame_bg, pady=5, relief="raised"):
-        super().__init__(controle_financeiro_view.root)
-        self.model = ControleFinanceiroModel()
+    def __init__(self, controle_financeiro_view):
+        super().__init__(controle_financeiro_view.root, width=1350,
+                         height=370, bg=frame_bg, pady=5, relief="raised")
+        self.model = controle_financeiro_view.model
         self.place(relx=0.02, rely=0.12, relwidth=0.96, relheight=0.42)
         self.criar_componentes()
+        self.atualizar_frame()
 
     def criar_componentes(self):
         self.criar_progressbar()
@@ -221,7 +227,7 @@ class Frame3:
         self.frame3 = Frame(controle_financeiro_view.root, width=1350,
                             height=360, bg=frame_bg, relief="flat", bd=4)
         self.frame3.place(relx=0.02, rely=0.56, relwidth=0.96, relheight=0.42)
-        self.model = ControleFinanceiroModel()
+        self.model = controle_financeiro_view.model
 
         self.frame3.columnconfigure([0, 1, 2, 3], weight=1)
         self.frame3.rowconfigure(0, weight=1)
@@ -231,6 +237,23 @@ class Frame3:
         self.create_despesas_frame()
         self.create_receitas_frame()
         self.create_inserir_categoria_frame()
+
+    def update_comboboxes(self):
+        categorias = self.model.listar_categorias()
+        descricoes = self.model.listar_descricoes()
+
+        if hasattr(self, 'combo_categoria_despesa'):
+            self.combo_categoria_despesa["values"] = [
+                item[1] for item in categorias]
+        if hasattr(self, 'combo_descricao_despesa'):
+            self.combo_descricao_despesa["values"] = [
+                item[1] for item in descricoes]
+        if hasattr(self, 'combo_categoria_receitas'):
+            self.combo_categoria_receitas["values"] = [
+                item[1] for item in categorias]
+        if hasattr(self, 'combo_descricao'):
+            self.combo_descricao["values"] = [
+                item[1] for item in descricoes]
 
     def create_subframes(self):
         self.frames = {}
@@ -364,6 +387,7 @@ class Frame3:
         values = [item[1] for item in items]
         combobox = ttk.Combobox(frame, values=values, width=10)
         combobox.place(x=5, y=y)
+        self.update_comboboxes()
         return combobox
 
     def create_date_entry(self, frame, y):
@@ -393,9 +417,11 @@ class Frame3:
         )
         self.model.inserir_despesa(despesa)
         self.update_treeview()
+        self.update_comboboxes()
 
     def delete_despesa(self):
         self.delete_item("Despesas")
+        self.update_comboboxes()
 
     def add_receita(self):
         receita = (
@@ -406,27 +432,33 @@ class Frame3:
         )
         self.model.inserir_receita(receita)
         self.update_treeview()
+        self.update_comboboxes()
 
     def delete_receita(self):
         self.delete_item("Receitas")
+        self.update_comboboxes()
 
     def add_categoria(self):
         categoria = self.entry_categoria.get()
         self.model.inserir_categoria(categoria)
         self.update_treeview()
         self.entry_categoria.delete(0, "end")
+        self.update_comboboxes()
 
     def delete_categoria(self):
         self.delete_item("Categorias")
+        self.update_comboboxes()
 
     def add_descricao(self):
         descricao = self.entry_descricao.get()
         self.model.inserir_descricao(descricao)
         self.update_treeview()
         self.entry_descricao.delete(0, "end")
+        self.update_comboboxes()
 
     def delete_descricao(self):
         self.delete_item("Descrições")
+        self.update_comboboxes()
 
     def delete_item(self, table):
         selected_item = self.tree.selection()
@@ -435,6 +467,7 @@ class Frame3:
             self.model.delete_item(table, item_id)
             self.tree.delete(selected_item)
             self.update_treeview()
+            self.update_comboboxes()
 
     def load_image(self, image_file):
         base_dir = os.path.dirname(__file__)
