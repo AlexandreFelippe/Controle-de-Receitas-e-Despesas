@@ -3,19 +3,18 @@ from tkinter.ttk import Progressbar
 from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from view import ControleFinanceiroView
+from tkinter import Frame
 
 frame = "#dfe3ee"
 fonte = "#38576B"
 colors = ["#5588bb", "#66bbbb", "#99bb55", "#ee9944", "#444466", "#bb5555"]
 
 
-class Frame2(ControleFinanceiroView):
+class Frame2(Frame):
     def __init__(self, controle_financeiro_view):
+        super().__init__(controle_financeiro_view.root)
         self.root = controle_financeiro_view.root
-        self.frame2 = controle_financeiro_view.frame2
         self.model = controle_financeiro_view.model
-
         self.criar_componentes()
 
     def criar_componentes(self):
@@ -25,13 +24,13 @@ class Frame2(ControleFinanceiroView):
         self.criar_grafico_pizza()
 
     def atualizar_frame(self):
-        for widget in self.frame2.winfo_children():
+        for widget in self.winfo_children():
             widget.destroy()
         self.criar_componentes()
 
     def criar_progressbar(self):
         self.label = Label(
-            self.frame2,
+            self,
             text="Percentual da Receita Restante",
             font=("Arial", 12),
             height=1,
@@ -46,7 +45,7 @@ class Frame2(ControleFinanceiroView):
         style.configure("TprogressBar", thickness=25)
 
         self.label_progressbar = Progressbar(
-            self.frame2,
+            self,
             style="black.Horizontal.TProgressbar",
             length=180,
         )
@@ -55,7 +54,7 @@ class Frame2(ControleFinanceiroView):
         self.label_progressbar["value"] = percentual
 
         self.label_percentual_texto = Label(
-            self.frame2,
+            self,
             text="{:.2f}%".format(percentual),
             font=("Arial", 12),
             anchor=NW,
@@ -100,7 +99,7 @@ class Frame2(ControleFinanceiroView):
         ax.yaxis.grid(False)
         ax.xaxis.grid(False)
 
-        canva = FigureCanvasTkAgg(fig, master=self.frame2)
+        canva = FigureCanvasTkAgg(fig, master=self)
         canva.get_tk_widget().place(x=10, y=70)
 
     def criar_resumo(self):
@@ -111,7 +110,7 @@ class Frame2(ControleFinanceiroView):
 
     def _criar_label_sumario(self, texto, valor, y_texto, y_valor):
         Label(
-            self.frame2,
+            self,
             text="",
             width=215,
             height=1,
@@ -121,7 +120,7 @@ class Frame2(ControleFinanceiroView):
         ).place(x=309, y=y_texto + 17)
 
         Label(
-            self.frame2,
+            self,
             text=texto.upper(),
             height=1,
             anchor=NW,
@@ -131,7 +130,7 @@ class Frame2(ControleFinanceiroView):
         ).place(x=306, y=y_texto)
 
         Label(
-            self.frame2,
+            self,
             text="R$ {:,.2f}".format(valor),
             height=1,
             anchor=NW,
@@ -163,5 +162,5 @@ class Frame2(ControleFinanceiroView):
             fontsize=8,
         )
 
-        canva = FigureCanvasTkAgg(fig, master=self.frame2)
+        canva = FigureCanvasTkAgg(fig, master=self)
         canva.get_tk_widget().place(x=600, y=0)

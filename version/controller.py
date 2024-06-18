@@ -1,8 +1,6 @@
 from tkinter import Tk
 from model import ControleFinanceiroModel
-from view import ControleFinanceiroView, Frame1
-from frame3_view import Frame3
-from frame2_view import Frame2
+from view import ControleFinanceiroView, Frame1, Frame2, Frame3
 import db_setup
 
 if __name__ == "__main__":
