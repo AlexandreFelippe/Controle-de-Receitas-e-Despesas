@@ -47,7 +47,7 @@ class Frame1:
             self.root, width=1350, height=50, bg=frame_bg, relief="flat", bd=4
         )
         self.frame1.place(relx=0.02, rely=0.02, relwidth=0.96, relheight=0.08)
-        self.img = Image.open("cofrinho.jpg")
+        self.img = Image.open("version/cofrinho.jpg")
         self.img = self.img.resize((45, 45))
         self.img = ImageTk.PhotoImage(self.img)
 
