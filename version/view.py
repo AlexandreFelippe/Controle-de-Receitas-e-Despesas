@@ -257,11 +257,14 @@ class Frame3(Frame):
         descricoes = self.model.listar_descricoes()
 
         if hasattr(self, "combo_categoria_despesa"):
-            self.combo_categoria_despesa["values"] = [item[1] for item in categorias]
+            self.combo_categoria_despesa["values"] = [
+                item[1] for item in categorias]
         if hasattr(self, "combo_descricao_despesa"):
-            self.combo_descricao_despesa["values"] = [item[1] for item in descricoes]
+            self.combo_descricao_despesa["values"] = [
+                item[1] for item in descricoes]
         if hasattr(self, "combo_categoria_receitas"):
-            self.combo_categoria_receitas["values"] = [item[1] for item in categorias]
+            self.combo_categoria_receitas["values"] = [
+                item[1] for item in categorias]
         if hasattr(self, "combo_descricao"):
             self.combo_descricao["values"] = [item[1] for item in descricoes]
 
@@ -309,7 +312,8 @@ class Frame3(Frame):
 
         for label, y in zip(labels, y_positions):
             Label(
-                frame, text=label, font=("Arial", 10), bg=frame.cget("bg"), fg=fonte
+                frame, text=label, font=("Arial", 10),
+                bg=frame.cget("bg"), fg=fonte
             ).place(x=5, y=y)
 
         self.combo_categoria_despesa = self.create_combobox(
@@ -336,7 +340,8 @@ class Frame3(Frame):
 
         for label, y in zip(labels, y_positions):
             Label(
-                frame, text=label, font=("Arial", 10), bg=frame.cget("bg"), fg=fonte
+                frame, text=label, font=("Arial", 10),
+                bg=frame.cget("bg"), fg=fonte
             ).place(x=5, y=y)
 
         self.combo_categoria_receitas = self.create_combobox(
@@ -408,7 +413,8 @@ class Frame3(Frame):
     def create_button(self, frame, image_file, command, y, x):
         image = self.load_image(image_file)
         button = Button(
-            frame, image=image, command=command, relief=tk.FLAT, bg=frame.cget("bg")
+            frame, image=image, command=command,
+            relief=tk.FLAT, bg=frame.cget("bg")
         )
         button.image = image
         button.place(x=x, y=y)
