@@ -1,4 +1,4 @@
-from tkinter import (Frame, Label, RAISED, LEFT, NW, Button, ttk)
+from tkinter import Frame, Label, RAISED, LEFT, NW, Button, ttk
 from tkinter.ttk import Progressbar
 from PIL import Image, ImageTk
 from model import ControleFinanceiroModel
@@ -44,7 +44,8 @@ class Frame1:
     def __init__(self, controle_financeiro_view):
         self.root = controle_financeiro_view.root
         self.frame1 = Frame(
-            self.root, width=1350, height=50, bg=frame_bg, relief="flat", bd=4)
+            self.root, width=1350, height=50, bg=frame_bg, relief="flat", bd=4
+        )
         self.frame1.place(relx=0.02, rely=0.02, relwidth=0.96, relheight=0.08)
         self.img = Image.open("cofrinho.jpg")
         self.img = self.img.resize((45, 45))
@@ -66,8 +67,14 @@ class Frame1:
 
 class Frame2(Frame):
     def __init__(self, controle_financeiro_view):
-        super().__init__(controle_financeiro_view.root, width=1350,
-                         height=370, bg=frame_bg, pady=5, relief="raised")
+        super().__init__(
+            controle_financeiro_view.root,
+            width=1350,
+            height=370,
+            bg=frame_bg,
+            pady=5,
+            relief="raised",
+        )
         self.model = controle_financeiro_view.model
         self.place(relx=0.02, rely=0.12, relwidth=0.96, relheight=0.42)
         self.criar_componentes()
@@ -199,8 +206,7 @@ class Frame2(Frame):
         fig = plt.figure(figsize=(4.9, 3), dpi=90, facecolor=frame_bg)
         plt.subplots_adjust(left=0)
         ax = fig.add_subplot(111, facecolor=frame_bg)
-        lista_categorias, lista_valores = (
-            self.model.pie_chart())
+        lista_categorias, lista_valores = self.model.pie_chart()
         explode = [0.05 for _ in lista_categorias]
         ax.pie(
             lista_valores,
@@ -222,10 +228,18 @@ class Frame2(Frame):
         canva.get_tk_widget().place(x=600, y=0)
 
 
-class Frame3:
+class Frame3(Frame):
     def __init__(self, controle_financeiro_view):
-        self.frame3 = Frame(controle_financeiro_view.root, width=1350,
-                            height=360, bg=frame_bg, relief="flat", bd=4)
+        self.controle_financeiro_view = controle_financeiro_view
+        self.frame3 = Frame(
+            controle_financeiro_view.root,
+            width=1350,
+            height=360,
+            bg=frame_bg,
+            relief="flat",
+            bd=4,
+        )
+        self.frame2 = Frame2(controle_financeiro_view)
         self.frame3.place(relx=0.02, rely=0.56, relwidth=0.96, relheight=0.42)
         self.model = controle_financeiro_view.model
 
@@ -242,18 +256,14 @@ class Frame3:
         categorias = self.model.listar_categorias()
         descricoes = self.model.listar_descricoes()
 
-        if hasattr(self, 'combo_categoria_despesa'):
-            self.combo_categoria_despesa["values"] = [
-                item[1] for item in categorias]
-        if hasattr(self, 'combo_descricao_despesa'):
-            self.combo_descricao_despesa["values"] = [
-                item[1] for item in descricoes]
-        if hasattr(self, 'combo_categoria_receitas'):
-            self.combo_categoria_receitas["values"] = [
-                item[1] for item in categorias]
-        if hasattr(self, 'combo_descricao'):
-            self.combo_descricao["values"] = [
-                item[1] for item in descricoes]
+        if hasattr(self, "combo_categoria_despesa"):
+            self.combo_categoria_despesa["values"] = [item[1] for item in categorias]
+        if hasattr(self, "combo_descricao_despesa"):
+            self.combo_descricao_despesa["values"] = [item[1] for item in descricoes]
+        if hasattr(self, "combo_categoria_receitas"):
+            self.combo_categoria_receitas["values"] = [item[1] for item in categorias]
+        if hasattr(self, "combo_descricao"):
+            self.combo_descricao["values"] = [item[1] for item in descricoes]
 
     def create_subframes(self):
         self.frames = {}
@@ -299,8 +309,7 @@ class Frame3:
 
         for label, y in zip(labels, y_positions):
             Label(
-                frame, text=label, font=("Arial", 10),
-                bg=frame.cget("bg"), fg=fonte
+                frame, text=label, font=("Arial", 10), bg=frame.cget("bg"), fg=fonte
             ).place(x=5, y=y)
 
         self.combo_categoria_despesa = self.create_combobox(
@@ -327,8 +336,7 @@ class Frame3:
 
         for label, y in zip(labels, y_positions):
             Label(
-                frame, text=label, font=("Arial", 10),
-                bg=frame.cget("bg"), fg=fonte
+                frame, text=label, font=("Arial", 10), bg=frame.cget("bg"), fg=fonte
             ).place(x=5, y=y)
 
         self.combo_categoria_receitas = self.create_combobox(
@@ -392,8 +400,7 @@ class Frame3:
 
     def create_date_entry(self, frame, y):
         entry = DateEntry(
-            frame, width=10, background="darkblue",
-            foreground=fonte, year=2023
+            frame, width=10, background="darkblue", foreground=fonte, year=2023
         )
         entry.place(x=5, y=y)
         return entry
@@ -401,8 +408,7 @@ class Frame3:
     def create_button(self, frame, image_file, command, y, x):
         image = self.load_image(image_file)
         button = Button(
-            frame, image=image, command=command,
-            relief=tk.FLAT, bg=frame.cget("bg")
+            frame, image=image, command=command, relief=tk.FLAT, bg=frame.cget("bg")
         )
         button.image = image
         button.place(x=x, y=y)
@@ -418,10 +424,12 @@ class Frame3:
         self.model.inserir_despesa(despesa)
         self.update_treeview()
         self.update_comboboxes()
+        self.update_charts()
 
     def delete_despesa(self):
         self.delete_item("Despesas")
         self.update_comboboxes()
+        self.update_charts()
 
     def add_receita(self):
         receita = (
@@ -433,10 +441,12 @@ class Frame3:
         self.model.inserir_receita(receita)
         self.update_treeview()
         self.update_comboboxes()
+        self.update_charts()
 
     def delete_receita(self):
         self.delete_item("Receitas")
         self.update_comboboxes()
+        self.update_charts()
 
     def add_categoria(self):
         categoria = self.entry_categoria.get()
@@ -444,10 +454,12 @@ class Frame3:
         self.update_treeview()
         self.entry_categoria.delete(0, "end")
         self.update_comboboxes()
+        self.update_charts()
 
     def delete_categoria(self):
         self.delete_item("Categorias")
         self.update_comboboxes()
+        self.update_charts()
 
     def add_descricao(self):
         descricao = self.entry_descricao.get()
@@ -455,10 +467,12 @@ class Frame3:
         self.update_treeview()
         self.entry_descricao.delete(0, "end")
         self.update_comboboxes()
+        self.update_charts()
 
     def delete_descricao(self):
         self.delete_item("Descrições")
         self.update_comboboxes()
+        self.update_charts()
 
     def delete_item(self, table):
         selected_item = self.tree.selection()
@@ -485,3 +499,6 @@ class Frame3:
 
         for item in lista_itens:
             self.tree.insert("", "end", values=item)
+
+    def update_charts(self):
+        self.frame2.atualizar_frame()
