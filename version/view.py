@@ -24,7 +24,7 @@ class ControleFinanceiroView:
 
     def criar_tela(self):
         self.root.title("Controle Financeiro")
-        self.root.geometry("1100x670")
+        self.root.geometry("1300x670")
         self.root.configure(bg=fundo_tela)
         self.root.resizable(True, True)
         self.root.maxsize(width=1380, height=800)
