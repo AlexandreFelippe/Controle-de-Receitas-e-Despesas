@@ -1,4 +1,4 @@
-from tkinter import Frame, Label, RAISED, LEFT, NW, Button, ttk
+from tkinter import Frame, Label, RAISED, LEFT, NW, Button, ttk, messagebox
 from tkinter.ttk import Progressbar
 from PIL import Image, ImageTk
 from model import ControleFinanceiroModel
@@ -24,7 +24,7 @@ class ControleFinanceiroView:
 
     def criar_tela(self):
         self.root.title("Controle Financeiro")
-        self.root.geometry("1300x670")
+        self.root.geometry("1350x670")
         self.root.configure(bg=fundo_tela)
         self.root.resizable(True, True)
         self.root.maxsize(width=1380, height=800)
@@ -78,18 +78,36 @@ class Frame2(Frame):
         self.model = controle_financeiro_view.model
         self.place(relx=0.02, rely=0.12, relwidth=0.96, relheight=0.42)
         self.criar_componentes()
-        self.atualizar_frame()
 
     def criar_componentes(self):
         self.criar_progressbar()
         self.criar_grafico_barras()
         self.criar_resumo()
         self.criar_grafico_pizza()
+        self.criar_botão_atualizar()
+
+    def criar_botão_atualizar(self):
+        self.atualizar_button = Button(
+            self,
+            text="Atualizar Dados",
+            font=("Arial", 10),
+            bg=fundo_tela,
+            fg="#ffffff",
+            command=self.botão_atualizar_frame,
+            relief=RAISED
+        )
+        self.atualizar_button.place(x=1050, y=5)
 
     def atualizar_frame(self):
-        for widget in self.winfo_children():
-            widget.destroy()
         self.criar_componentes()
+
+    def botão_atualizar_frame(self):
+        try:
+            for widget in self.winfo_children():
+                widget.destroy()
+            self.criar_componentes()
+        except Exception as e:
+            messagebox.showerror("Erro ao atualizar dados", str(e))
 
     def criar_progressbar(self):
         self.label = Label(
@@ -251,22 +269,25 @@ class Frame3(Frame):
         self.create_despesas_frame()
         self.create_receitas_frame()
         self.create_inserir_categoria_frame()
+        self.update_comboboxes()
 
     def update_comboboxes(self):
         categorias = self.model.listar_categorias()
         descricoes = self.model.listar_descricoes()
-
+        categorias_values = [item[1] for item in categorias]
+        descricoes_values = [item[1] for item in descricoes]
         if hasattr(self, "combo_categoria_despesa"):
-            self.combo_categoria_despesa["values"] = [
-                item[1] for item in categorias]
+            if self.combo_categoria_despesa.winfo_exists():
+                self.combo_categoria_despesa["values"] = categorias_values
         if hasattr(self, "combo_descricao_despesa"):
-            self.combo_descricao_despesa["values"] = [
-                item[1] for item in descricoes]
+            if self.combo_descricao_despesa.winfo_exists():
+                self.combo_descricao_despesa["values"] = descricoes_values
         if hasattr(self, "combo_categoria_receitas"):
-            self.combo_categoria_receitas["values"] = [
-                item[1] for item in categorias]
+            if self.combo_categoria_receitas.winfo_exists():
+                self.combo_categoria_receitas["values"] = categorias_values
         if hasattr(self, "combo_descricao"):
-            self.combo_descricao["values"] = [item[1] for item in descricoes]
+            if self.combo_descricao.winfo_exists():
+                self.combo_descricao["values"] = descricoes_values
 
     def create_subframes(self):
         self.frames = {}
@@ -428,14 +449,11 @@ class Frame3(Frame):
             self.entry_valor_despesas.get(),
         )
         self.model.inserir_despesa(despesa)
-        self.update_treeview()
-        self.update_comboboxes()
-        self.update_charts()
+        self.update_views()
 
     def delete_despesa(self):
         self.delete_item("Despesas")
-        self.update_comboboxes()
-        self.update_charts()
+        self.update_views()
 
     def add_receita(self):
         receita = (
@@ -445,40 +463,32 @@ class Frame3(Frame):
             self.entry_valor_receitas.get(),
         )
         self.model.inserir_receita(receita)
-        self.update_treeview()
-        self.update_comboboxes()
-        self.update_charts()
+        self.update_views()
 
     def delete_receita(self):
         self.delete_item("Receitas")
-        self.update_comboboxes()
-        self.update_charts()
+        self.update_views()
 
     def add_categoria(self):
         categoria = self.entry_categoria.get()
         self.model.inserir_categoria(categoria)
-        self.update_treeview()
+        self.update_views()
         self.entry_categoria.delete(0, "end")
-        self.update_comboboxes()
-        self.update_charts()
 
     def delete_categoria(self):
         self.delete_item("Categorias")
-        self.update_comboboxes()
-        self.update_charts()
+        self.update_views()
 
     def add_descricao(self):
         descricao = self.entry_descricao.get()
         self.model.inserir_descricao(descricao)
         self.update_treeview()
+        self.update_views()
         self.entry_descricao.delete(0, "end")
-        self.update_comboboxes()
-        self.update_charts()
 
     def delete_descricao(self):
         self.delete_item("Descrições")
-        self.update_comboboxes()
-        self.update_charts()
+        self.update_views()
 
     def delete_item(self, table):
         selected_item = self.tree.selection()
@@ -486,8 +496,7 @@ class Frame3(Frame):
             item_id = self.tree.item(selected_item, "values")[0]
             self.model.delete_item(table, item_id)
             self.tree.delete(selected_item)
-            self.update_treeview()
-            self.update_comboboxes()
+            self.update_views()
 
     def load_image(self, image_file):
         base_dir = os.path.dirname(__file__)
@@ -506,5 +515,7 @@ class Frame3(Frame):
         for item in lista_itens:
             self.tree.insert("", "end", values=item)
 
-    def update_charts(self):
+    def update_views(self):
+        self.update_treeview()
+        self.update_comboboxes()
         self.frame2.atualizar_frame()

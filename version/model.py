@@ -160,6 +160,16 @@ class ControleFinanceiroModel():
 
         return [category_list, value_list]
 
+    def date_filter(self, table, start_date, end_date):
+        try:
+            with self.conn:
+                query = f"SELECT * FROM {table} WHERE adicionado_em BETWEEN ? AND ?" # noqa
+                self.cur.execute(query, (start_date, end_date))
+                return self.cur.fetchall()
+        except Exception as e:
+            messagebox.showerror("Erro ao filtrar por data", str(e))
+            return []
+
     def is_valid_number(self, value):
         try:
             float(value)
